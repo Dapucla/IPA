@@ -31,6 +31,7 @@ class _MainScreenState extends State<MainScreen> {
   BitmapDescriptor? _placeMarkerIcon;
   bool _permissionGranted = false;
   bool _modalShown = false;
+  DateTime? _lastModalCloseTime;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -70,6 +71,18 @@ class _MainScreenState extends State<MainScreen> {
       name: "12 Victoria St",
       imageUrl: "assets/images/1.jpeg",
       audioUrl: "audio/12_victoria_st.mp3",
+    ),
+    Place(
+      location: const LatLng(45.03620618504771, 41.92264274952242),
+      name: "Площадь 200 лет",
+      imageUrl: "assets/images/1.jpeg",
+      audioUrl: "audio/171_rochford_st.mp3",
+    ),
+    Place(
+      location: const LatLng(45.037269707500386, 41.91733987977133),
+      name: "Универсам 1",
+      imageUrl: "assets/images/1.jpeg",
+      audioUrl: "audio/137_rochford_st.mp3",
     ),
     if (kDebugMode)
       Place(
@@ -273,10 +286,16 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _checkProximityToPlaces() {
+    if (_lastModalCloseTime != null &&
+        DateTime.now().difference(_lastModalCloseTime!).inSeconds < 5) {
+      return;
+    }
+
     for (var place in _places) {
-      if (_calculateDistance(_currentPosition, place.location) < 15 &&
-          !_modalShown) {
-        _showPlaceDetails(place);
+      if (_calculateDistance(_currentPosition, place.location) < 10) {
+        if (!_modalShown) {
+          _showPlaceDetails(place);
+        }
         break;
       }
     }
@@ -302,6 +321,7 @@ class _MainScreenState extends State<MainScreen> {
 
       await showModalBottomSheet(
         context: context,
+        isDismissible: true, // Окно можно закрыть свайпом
         builder: (context) {
           return FractionallySizedBox(
             heightFactor: 0.4,
@@ -329,12 +349,12 @@ class _MainScreenState extends State<MainScreen> {
           );
         },
         barrierColor: context.dialogBarrier.withOpacity(0.3),
-      );
+      ).whenComplete(() {
+        _modalShown = false;
+        _lastModalCloseTime = DateTime.now();
+      });
     } finally {
       _audioPlayer.stop();
-      setState(() {
-        _modalShown = false;
-      });
     }
   }
 }
