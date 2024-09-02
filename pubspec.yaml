@@ -43,6 +43,7 @@ dependencies:
   path_provider: ^2.1.4
   geolocator: ^13.0.1
   location: ^6.0.2
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -77,8 +78,10 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/icons/
     - assets/images/
+    - assets/audio/
 
   fonts:
     - family: Graphik
